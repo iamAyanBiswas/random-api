@@ -1,5 +1,5 @@
 {
-  "name": "random-api",
+  "name": "random-crypto-api",
   "version": "1.0.0",
   "description": "This package will help devs to generate random values, numbers, strings etc.",
   "main": "dist/index.js",
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/iamAyanBiswas/random-api.git"
   },
   "keywords": [
-    "random-api"
+    "random-crypto-api"
   ],
   "author": "Ayan Biswas",
   "license": "MIT",
