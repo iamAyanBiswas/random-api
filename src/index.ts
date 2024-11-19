@@ -1,11 +1,10 @@
-import crypto from 'crypto'
-
+import customCryptoModule from "./config";
 
 // Function to generate a random integer
 function randomInteger(length: number=4): number {
 
   const byteLength = Math.ceil(length * Math.log2(10) / 8);
-  const randomBytes = crypto.randomBytes(byteLength);
+  const randomBytes = customCryptoModule.randomBytes(byteLength);
 
   // Convert the random bytes into a big integer
   const randomInteger = BigInt('0x' + randomBytes.toString('hex'));
@@ -49,7 +48,7 @@ function randomIntegerInRange(min: number=0, max: number=10000): number {
   const range = max - min;
 
   // Generate random bytes (e.g., 4 bytes = 32 bits)
-  const randomBytes = crypto.randomBytes(4);
+  const randomBytes = customCryptoModule.randomBytes(4);
   const randomValue = randomBytes.readUInt32BE(0); // Convert the random bytes into an unsigned 32-bit integer
 
   // Map the random value to the desired range [min, max)
@@ -67,7 +66,7 @@ function randomFloatInRange(min: number=0, max: number=10000, precision: number=
   }
 
   // Generate random bytes (e.g., 8 bytes = 64 bits for better precision)
-  const randomBytes = crypto.randomBytes(8);
+  const randomBytes = customCryptoModule.randomBytes(8);
   const randomValue = randomBytes.readUInt32BE(0) * Math.pow(2, 32) + randomBytes.readUInt32BE(4); // Combine two 32-bit parts for a larger number
 
   // Scale the random value to the range [min, max)
@@ -87,7 +86,7 @@ function randomFloatInRange(min: number=0, max: number=10000, precision: number=
 // Function to generate a secure random string
 function randomString(length: number=4, charset: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'): string {
   const values = new Uint32Array(length);
-  crypto.getRandomValues(values);
+  customCryptoModule.getRandomValues(values);
 
   let randomString = '';
   for (let i = 0; i < length; i++) {

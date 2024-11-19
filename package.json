@@ -1,6 +1,6 @@
 {
   "name": "random-crypto-api",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "This package will help devs to generate random values, numbers, strings etc.",
   "main": "dist/index.js",
   "scripts": {
