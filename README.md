@@ -1,6 +1,6 @@
-# random-api
+# random-crypto-api
 
-random-api is a Typescript/Javascript library to generate random Numbers or Strings.
+random-crypto-api is a Typescript/Javascript library to generate random Numbers or Strings.
 
 ## Overview
 
@@ -15,7 +15,7 @@ Requirements:
 - npm (Node.js package manager)
 
 ```bash
-npm install random-api
+npm install random-crypto-api
 ```
 
 ### Usage
@@ -23,7 +23,7 @@ npm install random-api
 
 
 ```javascript
-import { randomInteger, randomFloat, randomIntegerInRange, randomFloatInRange, randomString } from 'random-api';
+import { randomInteger, randomFloat, randomIntegerInRange, randomFloatInRange, randomString } from 'random-crypto-api';
 
 let numInt = randomInteger(10); // Generates a random integer (e.g., numInt = 4556454549)
 
