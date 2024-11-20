@@ -1,6 +1,6 @@
 {
   "name": "random-crypto-api",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "This package will help devs to generate random values, numbers, strings etc.",
   "main": "dist/index.js",
   "scripts": {
@@ -21,7 +21,11 @@
   },
   "homepage": "https://github.com/iamAyanBiswas/random-api#readme",
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.9.0",
     "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0"
   }
 }

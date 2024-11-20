@@ -1,101 +1,114 @@
-import customCryptoModule from "./config";
-
-// Function to generate a random integer
-function randomInteger(length: number=4): number {
-
-  const byteLength = Math.ceil(length * Math.log2(10) / 8);
-  const randomBytes = customCryptoModule.randomBytes(byteLength);
-
-  // Convert the random bytes into a big integer
-  const randomInteger = BigInt('0x' + randomBytes.toString('hex'));
-
-  // Ensure the integer has the correct number of digits by taking the modulus
-  const max = BigInt(10 ** length); // Maximum number with `length` digits
-
-  return Number(randomInteger % max); // Modulo to get the correct number of digits
-
-}
+import CryptoJS from 'crypto-js';
 
 
 
 
-
-// Function to generate a random float
-function randomFloat(max: number=4): number {
-
-  // Generate a random integer with extra digits for precision
-  const randomInt = randomInteger(length + 10); // extra digits to ensure precision
-
-  // Convert it to a float with the required number of decimal places
-  const divisor = Math.pow(10, length);
-  return randomInt / divisor;
-
-}
-
-
-
-
-
-
-
-//To generate random integer in range
-function randomIntegerInRange(min: number=0, max: number=10000): number {
-  if (min >= max) {
-    throw new Error('Max must be greater than min');
+// Generate a random integer with dynamic length
+ const randomInteger = (length: number=8): number => {
+  if (length <= 0) {
+    throw new Error("Length must be a positive integer.");
   }
 
-  // Calculate the range size
-  const range = max - min;
+  const min = Math.pow(10, length - 1);  // Minimum value for the given length
+  const max = Math.pow(10, length) - 1;  // Maximum value for the given length
 
-  // Generate random bytes (e.g., 4 bytes = 32 bits)
-  const randomBytes = customCryptoModule.randomBytes(4);
-  const randomValue = randomBytes.readUInt32BE(0); // Convert the random bytes into an unsigned 32-bit integer
+  const randomBytes = CryptoJS.lib.WordArray.random(4);  // Generate 4 random bytes
+  const randomValue = randomBytes.words[0] & 0x7fffffff;  // Return a positive 32-bit integer
 
-  // Map the random value to the desired range [min, max)
-  return min + (randomValue % range); // Ensure the value falls within the range
-}
+  return min + (randomValue % (max - min + 1));  // Scale to fit in the given range
+};
 
 
 
 
+// Generate a random float with dynamic precision
+  const randomFloat = (length: number=8, decimalPlaces: number = 2): number => {
+    if (length <= 0 || decimalPlaces < 0) {
+      throw new Error("Length must be a positive integer and decimalPlaces must be a non-negative integer.");
+    }
+  
+    // Calculate the minimum and maximum values for the integer part based on the length
+    const min = Math.pow(10, length - 1);  // Minimum value for the given length (e.g., for 3 digits, this is 100)
+    const max = Math.pow(10, length) - 1;  // Maximum value for the given length (e.g., for 3 digits, this is 999)
+  
+    // Generate a random integer value within the desired range using crypto-js
+    const randomBytes = CryptoJS.lib.WordArray.random(4);  // Generate 4 random bytes
+    const randomValue = randomBytes.words[0] & 0x7fffffff;  // Return a positive 32-bit integer
+  
+    // Scale to fit the desired range [min, max] for the integer part
+    const integerPart = min + (randomValue % (max - min + 1));  // This gives us an integer of the specified length
+  
+    // Generate a random float between 0 and 1
+    const randomFloat = randomValue / 0x7fffffff;  // Normalize it to [0, 1]
+  
+    // Scale the float to the desired number of decimal places
+    const multiplier = Math.pow(10, decimalPlaces);
+    const decimalPart = Math.floor(randomFloat * multiplier) / multiplier;  // Truncate to the desired decimal precision
+  
+    // Combine integer part and decimal part
+    return integerPart + decimalPart;  // Final result with both length and precision
+  };
 
-//To generate random float in range
-function randomFloatInRange(min: number=0, max: number=10000, precision: number=8): number {
-  if (min >= max) {
-    throw new Error('Max must be greater than min');
-  }
-
-  // Generate random bytes (e.g., 8 bytes = 64 bits for better precision)
-  const randomBytes = customCryptoModule.randomBytes(8);
-  const randomValue = randomBytes.readUInt32BE(0) * Math.pow(2, 32) + randomBytes.readUInt32BE(4); // Combine two 32-bit parts for a larger number
-
-  // Scale the random value to the range [min, max)
-  const scaledValue = min + (randomValue / Math.pow(2, 64)) * (max - min);
-
-  // Round the result to the specified precision
-  const factor = Math.pow(10, precision);
-  return Math.round(scaledValue * factor) / factor;
-}
 
 
 
+  const randomIntegerInRange = (min: number=0, max: number=1000): number => {
+    // Ensure the range is valid
+    if (min > max) {
+      throw new Error("Min cannot be greater than Max.");
+    }
+  
+    // Generate a random 32-bit value using crypto-js
+    const randomBytes = CryptoJS.lib.WordArray.random(4);  // Generate 4 random bytes
+    const randomValue = randomBytes.words[0] & 0x7fffffff;  // Ensure it's a positive 32-bit integer
+  
+    // Scale the value to the specified range [min, max]
+    return min + (randomValue % (max - min + 1));  // Return the integer within the range [min, max]
+  };
+
+
+
+
+  
+  // Generate a random float within a specified range [min, max] with a specific number of decimal places
+  const randomFloatInRange = (min: number, max: number, decimalPlaces: number = 2): number => {
+    // Ensure the range and decimalPlaces are valid
+    if (min > max) {
+      throw new Error("Min cannot be greater than Max.");
+    }
+  
+    if (decimalPlaces < 0) {
+      throw new Error("Decimal places must be a non-negative integer.");
+    }
+  
+    // Generate a random 32-bit value using crypto-js
+    const randomBytes = CryptoJS.lib.WordArray.random(4);  // Generate 4 random bytes
+    const randomValue = randomBytes.words[0] & 0x7fffffff;  // Ensure it's a positive 32-bit integer
+  
+    // Scale the value to the specified range [min, max]
+    const randomFloat = (randomValue / 0x7fffffff) * (max - min) + min;
+  
+    // Scale the float to the desired number of decimal places
+    const multiplier = Math.pow(10, decimalPlaces);
+    return Math.floor(randomFloat * multiplier) / multiplier;  // Truncate and return with the specified precision
+  };
+  
 
 
 
 
 // Function to generate a secure random string
-function randomString(length: number=4, charset: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'): string {
-  const values = new Uint32Array(length);
-  customCryptoModule.getRandomValues(values);
+const randomString = (length: number = 8): string => {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
 
-  let randomString = '';
   for (let i = 0; i < length; i++) {
-    const randomIndex = values[i] % charset.length;
-    randomString += charset[randomIndex];
+    const randomIndex = randomInteger(8) % charactersLength;
+    result += characters.charAt(randomIndex);
   }
-
-  return randomString;
-}
+  return result;
+};
 
 
 
